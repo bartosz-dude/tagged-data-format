@@ -8,9 +8,9 @@
 	],
 	"repository": {
 		"type": "github",
-		"url": ""
+		"url": "https://github.com/bartosz-dude/tagged-data-format"
 	},
-	"homepage": "",
+	"homepage": "https://github.com/bartosz-dude/tagged-data-format",
 	"funding": {
 		"type": "ko-fi",
 		"url": "https://ko-fi.com/bartoszdude"
