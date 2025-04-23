@@ -107,7 +107,7 @@ Checks if TDF has a tag.
 
 ```typescript
 tdf.hasTag("tag")
-tdf.hasTag("dynamic-tag:arg")
+tdf.hasTag("dynamic-tag:")
 ```
 
 Returns the string form of the TDF

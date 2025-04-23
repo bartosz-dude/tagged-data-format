@@ -4,7 +4,7 @@ type DynamicFormatTagBase = `${string}:`
 export type DynamicFormatTag = `${DynamicFormatTagBase}${string}`
 export type FormatTag = BasicFormatTag | DynamicFormatTag
 
-interface TaggedDataFormatObject {
+export interface TaggedDataFormatObject {
 	format: BaseFormat
 	tags: BasicFormatTag[]
 	dynamicTags: DynamicFormatTag[]
@@ -29,7 +29,7 @@ export class TaggedDataFormat {
 	 * @returns an instance of TaggedDataFormat
 	 */
 	constructor(
-		tdf?: string | TaggedDataFormat | TaggedDataFormatObject,
+		tdf?: string | TaggedDataFormat | Partial<TaggedDataFormatObject>,
 		base?: TaggedDataFormat
 	) {
 		if (tdf === undefined) {
@@ -105,7 +105,7 @@ export class TaggedDataFormat {
 		}
 
 		if (base === undefined) {
-			this.#format = tdf.format
+			this.#format = tdf.format ?? "/"
 			this.#tags = new Set(tdf.tags)
 			this.#dTags = new Set(tdf.dynamicTags)
 			this.#requiredTags = new Set()
@@ -114,9 +114,12 @@ export class TaggedDataFormat {
 
 			return
 		} else {
-			this.#format = tdf.format
-			this.#tags = new Set([...base.tags, ...tdf.tags])
-			this.#dTags = new Set([...base.dynamicTags, ...tdf.dynamicTags])
+			this.#format = tdf.format ?? "/"
+			this.#tags = new Set([...base.tags, ...(tdf.tags ?? [])])
+			this.#dTags = new Set([
+				...base.dynamicTags,
+				...(tdf.dynamicTags ?? []),
+			])
 			this.#requiredTags = new Set()
 			this.#excludedTags = new Set()
 			this.#dValidatiors = base.#dValidatiors
@@ -232,7 +235,8 @@ export class TaggedDataFormat {
 	 */
 	updateDynamicTag(tag: DynamicFormatTag) {
 		if (tag.includes(":")) {
-			const found = this.#dTags.values().find((v) => v.startsWith(tag))
+			const dTag = tag.split(":")[0]!
+			const found = this.#dTags.values().find((v) => v.startsWith(dTag))
 			if (found !== undefined) {
 				this.#dTags.delete(found)
 			}
@@ -273,12 +277,18 @@ export class TaggedDataFormat {
 	static parseString(tdf: string): TaggedDataFormatObject {
 		const fragments = tdf.split("#")
 
-		const tags = fragments.filter(
-			(v) => !v.includes(":")
-		) as BasicFormatTag[]
-		const dynamicTags = fragments.filter((v) =>
-			v.includes(":")
-		) as DynamicFormatTag[]
+		const tags =
+			fragments.length > 1
+				? (fragments
+						.slice(1)
+						.filter((v) => !v.includes(":")) as BasicFormatTag[])
+				: ([] as BasicFormatTag[])
+		const dynamicTags =
+			fragments.length > 1
+				? (fragments
+						.slice(1)
+						.filter((v) => v.includes(":")) as DynamicFormatTag[])
+				: ([] as DynamicFormatTag[])
 
 		return {
 			format: fragments[0] as BaseFormat,
@@ -309,9 +319,11 @@ export class TaggedDataFormat {
 	 * Converts tagged data fromat object to it's string form
 	 */
 	static toString(tdf: TaggedDataFormatObject): string {
-		let out = tdf.format
-		tdf.tags.forEach((v) => (out = out + v.replace("#", "")))
-		tdf.dynamicTags.forEach((v) => (out = out + v.replace("#", "")))
+		let out: string = tdf.format
+		tdf.tags.forEach((v) => (out = out.concat("#" + v.replace("#", ""))))
+		tdf.dynamicTags.forEach(
+			(v) => (out = out.concat("#" + v.replace("#", "")))
+		)
 		return out as string
 	}
 
