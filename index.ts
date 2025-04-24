@@ -147,7 +147,12 @@ export class TaggedDataFormat {
 			return false
 		}
 
-		if (!this.#requiredTags.isSupersetOf(tdf.#tags)) {
+		if (
+			!(
+				this.#requiredTags.intersection(tdf.#tags).size ===
+				this.#requiredTags.size
+			)
+		) {
 			return false
 		}
 
