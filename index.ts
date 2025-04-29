@@ -133,8 +133,13 @@ export class TaggedDataFormat {
 	 *
 	 * if called without the argument, it performs validation against itself
 	 */
-	validate(tdf?: TaggedDataFormat): boolean {
+	validate(tdf?: TaggedDataFormat | string): boolean {
 		tdf ??= this
+
+		if (typeof tdf == "string") {
+			tdf = new TaggedDataFormat(tdf)
+			return this.validate(tdf)
+		}
 
 		if (
 			this.#requiredFormat !== null &&

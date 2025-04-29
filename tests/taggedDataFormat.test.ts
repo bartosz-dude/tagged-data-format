@@ -140,7 +140,7 @@ describe("validating TDF", () => {
 	test("required format", () => {
 		const tdf = new TaggedDataFormat("data/format#a#b:b")
 		expect(tdf.validate()).toBe(true)
-		
+
 		tdf.requiredFormat = "data/format"
 		expect(tdf.validate()).toBe(true)
 
@@ -151,11 +151,23 @@ describe("validating TDF", () => {
 	test("required tag", () => {
 		const tdf = new TaggedDataFormat("data/format#a#b:b")
 		expect(tdf.validate()).toBe(true)
-		
+
 		tdf.requireTag("a")
 		expect(tdf.validate()).toBe(true)
 
 		tdf.requireTag("c")
 		expect(tdf.validate()).toBe(false)
+	})
+
+	test("validating string", () => {
+		const tdf = new TaggedDataFormat()
+
+		tdf.requiredFormat = "data/format"
+
+		tdf.requireTag("a")
+		tdf.excludeTag("b")
+
+		expect(tdf.validate("data/format#a#b:b")).toBe(true)
+		expect(tdf.validate("data/format#b#b:b")).toBe(false)
 	})
 })
