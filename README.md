@@ -212,6 +212,24 @@ console.log(tdf.requiredDynamicTags) // [ "dynamic-tag:" ]
 tdf.removeValidator("dynamic-tag:") // removes the "dynamic-tag:" from the dynamic tags validators
 ```
 
+## Known Problems
+
+Doing this
+
+```typescript
+const tdf2 = new TaggedDataFormat({
+ format: "2example/example",
+ tags: ["tag"],
+ dynamicTag: ["dynamic-tag:arg"]
+})
+
+const tdf3 = new TaggedDataFormat(tdf2)
+const tdf4 = new TaggedDataFormat(tdf2)
+const tdf5 = new TaggedDataFormat(tdf2)
+```
+
+`tdf3`, `tdf4` and `tdf5` will share the same value in dynamic tags.
+
 ## Support
 
 If you like the package, you can support me by buying me a tea.
